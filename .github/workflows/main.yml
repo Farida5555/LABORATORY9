@@ -20,26 +20,43 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Проверка структуры (Debug)
+      - name: Полная проверка файлов (Диагностика)
         run: |
-          echo "Содержимое корня:"
+          echo "=== ГДЕ Я НАХОЖУСЬ ==="
+          pwd
+          echo "=== ЧТО В КОРНЕ РЕПОЗИТОРИЯ ==="
           ls -F
-          echo "Содержимое папки kel:"
-          ls -F kel/ || echo "Папка kel не найдена!"
-
-      - name: Установка зависимостей и тест
-        run: |
-          # Если test.py в корне:
-          python test.py
-
-      - name: Проверка работы программы
-        working-directory: ./kel
-        run: |
-          # Запуск main.py и проверка лога
-          echo "25" | python main.py
-          if [ -f app.log ]; then
-            echo "лог-файл создан"
+          echo "=== ЧТО ВНУТРИ ПАПКИ KEL ==="
+          if [ -d "kel" ]; then
+            ls -F kel
           else
-            echo "лог-файл не создан"
-            exit 1
+            echo "ОШИБКА: Папки kel не существует в корне!"
+          fi
+
+      - name: Запуск теста (с проверкой)
+        run: |
+          if [ -f "test.py" ]; then
+            python test.py
+          elif [ -f "kel/test.py" ]; then
+            python kel/test.py
+          else
+            echo "Файл test.py не найден ни в корне, ни в kel/"
+            exit 2
+          fi
+
+      - name: Запуск программы в kel
+        run: |
+          cd kel
+          if [ -f "main.py" ]; then
+            echo "25" | python main.py
+            if [ -f "app.log" ]; then
+              echo "Успех: лог создан"
+            else
+              echo "Ошибка: лог-файл НЕ появился"
+              ls -F # Посмотрим, что создалось вместо него
+              exit 1
+            fi
+          else
+            echo "ОШИБКА: Файл main.py не найден в папке kel!"
+            exit 2
           fi
