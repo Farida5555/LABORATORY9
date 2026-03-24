@@ -1,0 +1,36 @@
+name: Python Project CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  test-and-log-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Копирование кода
+        uses: actions/checkout@v4
+
+      - name: Установка Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Установка зависимостей
+        run: |
+          python test.py
+
+      - name: Проверка работы программы
+        working-directory: ./kel
+        run: |
+          echo "25" | python main.py
+          if [ -f app.log ]; then
+            echo "лог-файл создан"
+          else
+            echo "лог-файл не создан"
+            exit 1
+          fi
