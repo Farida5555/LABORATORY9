@@ -2,9 +2,9 @@ name: Python Project CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -20,13 +20,22 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Установка зависимостей
+      - name: Проверка структуры (Debug)
         run: |
+          echo "Содержимое корня:"
+          ls -F
+          echo "Содержимое папки kel:"
+          ls -F kel/ || echo "Папка kel не найдена!"
+
+      - name: Установка зависимостей и тест
+        run: |
+          # Если test.py в корне:
           python test.py
 
       - name: Проверка работы программы
         working-directory: ./kel
         run: |
+          # Запуск main.py и проверка лога
           echo "25" | python main.py
           if [ -f app.log ]; then
             echo "лог-файл создан"
