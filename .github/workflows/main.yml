@@ -78,12 +78,11 @@ jobs:
      - name: Create Artifact (Zip)
        run: |
         # Программанын жана логдорду архивге кошуу
-        zip -r project-v1.zip main.py geometry.py calc.py
-
+        zip -r project-v1.zip main.py test.py app.log
      - name: Create Release
        uses: softprops/action-gh-release@v1
        with:
          files: project-v1.zip
        env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-         
+
