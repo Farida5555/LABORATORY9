@@ -1,62 +1,89 @@
-name: Python Project CI/CD
+# name: Python Project CI/CD
+
+# on:
+#   push:
+#     branches: [main]
+#   pull_request:
+#     branches: [main]
+#   workflow_dispatch:
+
+# jobs:
+#   test-and-log-check:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Копирование кода
+#         uses: actions/checkout@v4
+
+#       - name: Установка Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.9'
+
+#       - name: Полная проверка файлов (Диагностика)
+#         run: |
+#           echo "=== ГДЕ Я НАХОЖУСЬ ==="
+#           pwd
+#           echo "=== ЧТО В КОРНЕ РЕПОЗИТОРИЯ ==="
+#           ls -F
+#           echo "=== ЧТО ВНУТРИ ПАПКИ KEL ==="
+#           if [ -d "kel" ]; then
+#             ls -F kel
+#           else
+#             echo "ОШИБКА: Папки kel не существует в корне!"
+#           fi
+
+#       - name: Запуск теста (с проверкой)
+#         run: |
+#           if [ -f "test.py" ]; then
+#             python test.py
+#           elif [ -f "kel/test.py" ]; then
+#             python kel/test.py
+#           else
+#             echo "Файл test.py не найден ни в корне, ни в kel/"
+#             exit 2
+#           fi
+
+#       - name: Запуск программы в kel
+#         run: |
+#           cd kel
+#           if [ -f "main.py" ]; then
+#             echo "25" | python main.py
+#             if [ -f "app.log" ]; then
+#               echo "Успех: лог создан"
+#             else
+#               echo "Ошибка: лог-файл НЕ появился"
+#               ls -F # Посмотрим, что создалось вместо него
+#               exit 1
+#             fi
+#           else
+#             echo "ОШИБКА: Файл main.py не найден в папке kel!"
+#             exit 2
+#           fi
+
+name: Build and Release
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+    tags:
+      -'v* #качан гана v1.0 сыяктуу тег колдонулганда иштейт
 
 jobs:
-  test-and-log-check:
-    runs-on: ubuntu-latest
+  build-and-deploy:
+   runs-on: ubuntu-latest
+   steps:
+     - name: Checkout code
+       uses: actions/checkout@v3
 
-    steps:
-      - name: Копирование кода
-        uses: actions/checkout@v4
+     - name: Create Artifact (Zip)
+       run: |
+        # Программанын жана логдорду архивге кошуу
+        zip -r project-v1.zip main.py geometry.py calc.py
 
-      - name: Установка Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-
-      - name: Полная проверка файлов (Диагностика)
-        run: |
-          echo "=== ГДЕ Я НАХОЖУСЬ ==="
-          pwd
-          echo "=== ЧТО В КОРНЕ РЕПОЗИТОРИЯ ==="
-          ls -F
-          echo "=== ЧТО ВНУТРИ ПАПКИ KEL ==="
-          if [ -d "kel" ]; then
-            ls -F kel
-          else
-            echo "ОШИБКА: Папки kel не существует в корне!"
-          fi
-
-      - name: Запуск теста (с проверкой)
-        run: |
-          if [ -f "test.py" ]; then
-            python test.py
-          elif [ -f "kel/test.py" ]; then
-            python kel/test.py
-          else
-            echo "Файл test.py не найден ни в корне, ни в kel/"
-            exit 2
-          fi
-
-      - name: Запуск программы в kel
-        run: |
-          cd kel
-          if [ -f "main.py" ]; then
-            echo "25" | python main.py
-            if [ -f "app.log" ]; then
-              echo "Успех: лог создан"
-            else
-              echo "Ошибка: лог-файл НЕ появился"
-              ls -F # Посмотрим, что создалось вместо него
-              exit 1
-            fi
-          else
-            echo "ОШИБКА: Файл main.py не найден в папке kel!"
-            exit 2
-          fi
+     - name: Create Release
+       uses: softprops/action-gh-release@v1
+       with:
+         files: project-v1.zip
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         
