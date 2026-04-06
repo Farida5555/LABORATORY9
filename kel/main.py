@@ -10,12 +10,12 @@ logging.basicConfig(
 def get_user():
     logging.info('Начелась опросник')
     try:
-        age_input = input('Введите ваш возраст: '
+        age_input = input('Введите ваш возраст: ')
         age = int(age_input)
         logging.info(f'Пользователь ввел возраст: {age}')
     except ValueError:
         logging.error(f'Ошибка при вводе возраста: {age_input}')
-        print('Пожалуйста, введите корректное число для возраста.'
+        print('Пожалуйста, введите корректное число для возраста.')
   
 
 if __name__ == '__main__':
